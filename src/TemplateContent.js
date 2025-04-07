@@ -45,7 +45,7 @@ class TemplateContent {
           read: false,
           render: false,
         },
-        types
+        types,
       );
     }
 
@@ -130,7 +130,7 @@ class TemplateContent {
       return this._frontMatter;
     } else {
       throw new Error(
-        "Unfortunately you’re using code that monkey patched some Eleventy internals and it isn’t async-friendly. Change your code to use the async `read()` method on the template instead!"
+        "Unfortunately you’re using code that monkey patched some Eleventy internals and it isn’t async-friendly. Change your code to use the async `read()` method on the template instead!",
       );
     }
   }
@@ -167,7 +167,7 @@ class TemplateContent {
             } catch (e) {
               throw new TemplateContentFrontMatterError(
                 `Having trouble reading front matter from template ${this.inputPath}`,
-                e
+                e,
               );
             }
 
@@ -349,7 +349,7 @@ class TemplateContent {
             key,
             new Promise((resolve) => {
               res = resolve;
-            })
+            }),
           );
         }
       }
@@ -374,7 +374,7 @@ class TemplateContent {
       debug(`Having trouble compiling template ${this.inputPath}: %O`, str);
       throw new TemplateContentCompileError(
         `Having trouble compiling template ${this.inputPath}`,
-        e
+        e,
       );
     }
   }
@@ -466,7 +466,7 @@ class TemplateContent {
       suffix.push(" (");
       if (data.pagination.pages) {
         suffix.push(
-          `${data.pagination.pages.length} page${data.pagination.pages.length !== 1 ? "s" : ""}`
+          `${data.pagination.pages.length} page${data.pagination.pages.length !== 1 ? "s" : ""}`,
         );
       } else {
         suffix.push("Pagination");
@@ -482,6 +482,12 @@ class TemplateContent {
         return str;
       }
 
+      // UPDATE NeoSahaeo neosahadeo@protonmail.com 07/04/2025
+      let shim = Math.random(); // Update the exist blocks to avoid bash errors
+      let matches = [...str.matchAll(/\${#.*\[@\]}/gm)];
+      str = str.replace(/\${#.*\[@\]}/gm, shim);
+      //
+
       let fn = await this.compile(str, bypassMarkdown, data[this.config.keys.engineOverride]);
 
       if (fn === undefined) {
@@ -495,7 +501,7 @@ class TemplateContent {
       // Skip benchmark for each individual pagination entry (very busy output)
       let logRenderToOutputBenchmark = "pagination" in data;
       let inputPathBenchmark = this.bench.get(
-        `> Render > ${this.inputPath}${this._getPaginationLogSuffix(data)}`
+        `> Render > ${this.inputPath}${this._getPaginationLogSuffix(data)}`,
       );
       let outputPathBenchmark;
       if (data.page && data.page.outputPath && logRenderToOutputBenchmark) {
@@ -511,6 +517,12 @@ class TemplateContent {
       }
 
       let rendered = await fn(data);
+
+      // UPDATE NeoSahadeo neosahadeo@protonmail.com 07/04/2025
+      matches.forEach((e) => {
+        rendered = rendered.replace(`${shim}`, e[0]);
+      });
+      //
 
       if (outputPathBenchmark) {
         outputPathBenchmark.after();
@@ -529,7 +541,7 @@ class TemplateContent {
         debug(`Having trouble rendering ${engine} template ${this.inputPath}: %O`, str);
         throw new TemplateContentRenderError(
           `Having trouble rendering ${engine} template ${this.inputPath}`,
-          e
+          e,
         );
       }
     }
@@ -553,7 +565,7 @@ class TemplateContent {
       "Test dependencies to see if %o is relevant to %o: %o",
       this.inputPath,
       incrementalFile,
-      isRelevant
+      isRelevant,
     );
 
     let extensionEntries = this.getExtensionEntries().filter((entry) => !!entry.isIncrementalMatch);
@@ -567,7 +579,7 @@ class TemplateContent {
               isFileRelevantToInputPath: isRelevant,
               doesFileHaveDependencies: hasDependencies,
             },
-            incrementalFile
+            incrementalFile,
           )
         ) {
           return true;
